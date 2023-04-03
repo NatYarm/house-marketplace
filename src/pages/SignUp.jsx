@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  updateProfile,
-} from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase.config';
+import { db, auth } from '../firebase.config';
 
 import { ReactComponent as ArrowRightIcon } from '../assets/svg/keyboardArrowRightIcon.svg';
 import visibilityIcon from '../assets/svg/visibilityIcon.svg';
@@ -34,8 +30,6 @@ const SignUp = () => {
     e.preventDefault();
 
     try {
-      const auth = getAuth();
-
       const { user } = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -45,8 +39,6 @@ const SignUp = () => {
       await updateProfile(auth.currentUser, {
         displayName,
       });
-
-      console.log(user);
 
       const formDataCopy = { ...formData };
       delete formDataCopy.password;
