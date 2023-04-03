@@ -5,19 +5,21 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from 'firebase/auth';
+import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase.config';
+
 import { ReactComponent as ArrowRightIcon } from '../assets/svg/keyboardArrowRightIcon.svg';
 import visibilityIcon from '../assets/svg/visibilityIcon.svg';
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    displayName: '',
     email: '',
     password: '',
   });
 
-  const { name, email, password } = formData;
+  const { displayName, email, password } = formData;
 
   const navigate = useNavigate();
 
@@ -28,29 +30,29 @@ const SignUp = () => {
     }));
   };
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const auth = getAuth();
 
-      console.log(auth);
-
-      const userCredential = await createUserWithEmailAndPassword(
+      const { user } = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
 
-      console.log(userCredential);
-
-      const user = userCredential.user;
+      await updateProfile(auth.currentUser, {
+        displayName,
+      });
 
       console.log(user);
 
-      updateProfile(auth.currentUser, {
-        displayName: name,
-      });
+      const formDataCopy = { ...formData };
+      delete formDataCopy.password;
+      formDataCopy.timestamp = serverTimestamp();
+
+      await setDoc(doc(db, 'users', user.uid), formDataCopy);
     } catch (error) {}
 
     navigate('/');
@@ -63,13 +65,13 @@ const SignUp = () => {
           <p className="pageHeader">Welcome Back!</p>
         </header>
         <main>
-          <form onSubmit={onSubmit}>
+          <form onSubmit={handleSubmit}>
             <input
               type="text"
               className="nameInput"
               placeholder="Name"
-              id="name"
-              value={name}
+              id="displayName"
+              value={displayName}
               onChange={onChange}
             />
             <input
