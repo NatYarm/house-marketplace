@@ -34,7 +34,7 @@ const SignIn = () => {
         navigate('/');
       }
     } catch (error) {
-      toast.error('Bad User Credentials');
+      toast.error('Incorrect email or password');
     }
   };
 
@@ -82,9 +82,12 @@ const SignIn = () => {
             </div>
           </form>
           {/* Google OAuth */}
-          <Link to="/sign-up" className="registerLink">
-            Sign Up Instead
-          </Link>
+          <div className="loginContainer">
+            <div className="loginText">Need an account?</div>
+            <Link to="/sign-up" className="registerLink">
+              Sign Up
+            </Link>
+          </div>
         </main>
       </div>
     </>

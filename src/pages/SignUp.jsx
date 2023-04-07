@@ -46,11 +46,15 @@ const SignUp = () => {
       formDataCopy.timestamp = serverTimestamp();
 
       await setDoc(doc(db, 'users', user.uid), formDataCopy);
-    } catch (error) {
-      toast.error('Something went wrong with registration');
-    }
 
-    navigate('/');
+      navigate('/profile');
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use')
+        toast.error('Email is already in use. Please log in to your account.');
+
+      if (error.code === 'auth/weak-password') toast.error('Weak password');
+      else toast.error('Something went wrong with registration');
+    }
   };
 
   return (
@@ -68,6 +72,7 @@ const SignUp = () => {
               id="displayName"
               value={displayName}
               onChange={onChange}
+              required
             />
             <input
               type="email"
@@ -76,6 +81,7 @@ const SignUp = () => {
               id="email"
               value={email}
               onChange={onChange}
+              required
             />
             <div className="passwordInputDiv">
               <input
@@ -85,6 +91,7 @@ const SignUp = () => {
                 id="password"
                 value={password}
                 onChange={onChange}
+                required
               />
               <img
                 src={visibilityIcon}
@@ -105,9 +112,13 @@ const SignUp = () => {
             </div>
           </form>
           {/* Google OAuth */}
-          <Link to="/sign-in" className="registerLink">
-            Sign In Instead
-          </Link>
+
+          <div className="loginContainer">
+            <div className="loginText">Already have an account?</div>
+            <Link to="/sign-in" className="registerLink">
+              Sign In
+            </Link>
+          </div>
         </main>
       </div>
     </>
