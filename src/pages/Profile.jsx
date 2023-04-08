@@ -80,7 +80,9 @@ const Profile = () => {
               type="email"
               id="email"
               className="profileEmail"
+              disabled={!changeDetails}
               value={email}
+              onChange={handleChange}
             />
           </form>
         </div>
