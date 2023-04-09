@@ -1,60 +1,58 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { db, auth } from '../firebase.config';
-
+import {
+  createAuthUserWithEmailAndPassword,
+  createUserDocument,
+} from '../utils/firebase.utils';
 import OAuth from '../components/OAuth';
 import { ReactComponent as ArrowRightIcon } from '../assets/svg/keyboardArrowRightIcon.svg';
 import visibilityIcon from '../assets/svg/visibilityIcon.svg';
 
-const SignUp = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    displayName: '',
-    email: '',
-    password: '',
-  });
+const defaultFormData = {
+  displayName: '',
+  email: '',
+  password: '',
+};
 
+const SignUp = () => {
+  const [formData, setFormData] = useState(defaultFormData);
+  const [showPassword, setShowPassword] = useState(false);
   const { displayName, email, password } = formData;
 
   const navigate = useNavigate();
 
-  const onChange = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [e.target.id]: e.target.value,
-    }));
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
+      const { user } = await createAuthUserWithEmailAndPassword(
         email,
         password
       );
 
-      await updateProfile(auth.currentUser, {
-        displayName,
-      });
-
-      const formDataCopy = { ...formData };
-      delete formDataCopy.password;
-      formDataCopy.timestamp = serverTimestamp();
-
-      await setDoc(doc(db, 'users', user.uid), formDataCopy);
+      await createUserDocument(user, { displayName });
 
       navigate('/profile');
     } catch (error) {
-      if (error.code === 'auth/email-already-in-use')
-        toast.error('Email is already in use. Please log in to your account.');
-
-      if (error.code === 'auth/weak-password') toast.error('Weak password');
-      else toast.error('Something went wrong with registration');
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          toast.error('Cannot create user, email already in use');
+          break;
+        case 'auth/weak-password':
+          toast.error('Weak password');
+          break;
+        default:
+          toast.error('Something went wrong with registration');
+      }
     }
   };
 
@@ -72,7 +70,7 @@ const SignUp = () => {
               placeholder="Name"
               id="displayName"
               value={displayName}
-              onChange={onChange}
+              onChange={handleChange}
               required
             />
             <input
@@ -81,7 +79,7 @@ const SignUp = () => {
               placeholder="Email"
               id="email"
               value={email}
-              onChange={onChange}
+              onChange={handleChange}
               required
             />
             <div className="passwordInputDiv">
@@ -91,7 +89,7 @@ const SignUp = () => {
                 placeholder="Password"
                 id="password"
                 value={password}
-                onChange={onChange}
+                onChange={handleChange}
                 required
               />
               <img

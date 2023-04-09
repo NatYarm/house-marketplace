@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase.config';
+import { signInAuthUserWithEmailAndPassword } from '../utils/firebase.utils';
 import OAuth from '../components/OAuth';
 import { ReactComponent as ArrowRightIcon } from '../assets/svg/keyboardArrowRightIcon.svg';
 import visibilityIcon from '../assets/svg/visibilityIcon.svg';
@@ -19,23 +18,36 @@ const SignIn = () => {
   const navigate = useNavigate();
 
   const onChange = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [e.target.id]: e.target.value,
-    }));
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      const { user } = await signInAuthUserWithEmailAndPassword(
+        email,
+        password
+      );
 
       if (user) {
         navigate('/');
       }
     } catch (error) {
-      toast.error('Incorrect email or password');
+      switch (error.code) {
+        case 'auth/wrong-password':
+          toast.error('Incorrect password');
+          break;
+        case 'auth/user-not-found':
+          toast.error('No user associated with this email');
+          break;
+        default:
+          toast.error('Problem logging in');
+      }
     }
   };
 

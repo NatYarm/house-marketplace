@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase.config';
 import { updateProfile } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
+import { signOutUser } from '../utils/firebase.utils';
 import { toast } from 'react-toastify';
 
 const Profile = () => {
@@ -17,7 +18,7 @@ const Profile = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    auth.signOut();
+    signOutUser();
     navigate('/');
   };
 
@@ -37,10 +38,11 @@ const Profile = () => {
   };
 
   const handleChange = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [e.target.id]: e.target.value,
-    }));
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value,
+    });
   };
 
   return (

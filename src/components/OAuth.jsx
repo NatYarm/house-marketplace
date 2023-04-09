@@ -1,7 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth, db } from '../firebase.config';
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  signInWithGooglePopup,
+  createUserDocument,
+} from '../utils/firebase.utils';
 import { toast } from 'react-toastify';
 import googleIcon from '../assets/svg/googleIcon.svg';
 
@@ -9,27 +10,15 @@ const OAuth = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const onGoogleClick = async () => {
+  const signInWithGoogle = async () => {
     try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const { user } = result;
+      const { user } = await signInWithGooglePopup();
+      await createUserDocument(user);
 
-      //Check for user
-      const docRef = doc(db, 'users', user.uid);
-      const docSnapshot = await getDoc(docRef);
-
-      //If user doesn't exist, create user
-      if (!docSnapshot.exists()) {
-        await setDoc(doc(db, 'users', user.uid), {
-          displayName: user.displayName,
-          email: user.email,
-          timestamp: serverTimestamp(),
-        });
-      }
       navigate('/');
     } catch (error) {
-      toast.error('Could not authorize with Google.');
+      if (error.code === 'auth/popup-closed-by-user') return;
+      else toast.error('Could not authorize with Google.');
     }
   };
 
@@ -41,7 +30,7 @@ const OAuth = () => {
           className="socialIconImg"
           src={googleIcon}
           alt="google icon"
-          onClick={onGoogleClick}
+          onClick={signInWithGoogle}
         />
       </button>
     </div>

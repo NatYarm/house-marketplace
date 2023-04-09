@@ -1,6 +1,15 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from 'firebase/auth';
+import { toast } from 'react-toastify';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyD17Zns_8cj2SGB1_r7qmWKtFiNxGXbCqc',
@@ -17,6 +26,10 @@ initializeApp(firebaseConfig);
 //create authentication
 export const auth = getAuth();
 
+// Set up authentication provider
+const googleProvider = new GoogleAuthProvider();
+
+//Creating db
 export const db = getFirestore();
 
 export const createUserDocument = async (user, addititonalInfo = {}) => {
@@ -37,12 +50,19 @@ export const createUserDocument = async (user, addititonalInfo = {}) => {
         created,
         ...addititonalInfo,
       });
+
+      await updateProfile(auth.currentUser, {
+        ...addititonalInfo,
+      });
     } catch (error) {
-      console.log('error creating the user', error.message);
+      toast.error('Error creating the user');
     }
   }
   return userDocRef;
 };
+
+export const signInWithGooglePopup = () =>
+  signInWithPopup(auth, googleProvider);
 
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
   if (!email || !password) return;
@@ -50,14 +70,10 @@ export const createAuthUserWithEmailAndPassword = async (email, password) => {
   return await createUserWithEmailAndPassword(auth, email, password);
 };
 
-// In the Suin-up component
+export const signInAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
 
-// try {
-//   const { user } = await createAuthUserWithEmailAndPassword(
-//     email,
-//     password
-//   );
-//   await createUserDocument(user, { displayName: name });
-// } catch (error) {
+  return await signInWithEmailAndPassword(auth, email, password);
+};
 
-// }
+export const signOutUser = async () => await signOut(auth);
