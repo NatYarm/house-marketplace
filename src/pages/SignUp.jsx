@@ -5,6 +5,7 @@ import {
   createAuthUserWithEmailAndPassword,
   createUserDocument,
 } from '../utils/firebase.utils';
+
 import OAuth from '../components/OAuth';
 import { ReactComponent as ArrowRightIcon } from '../assets/svg/keyboardArrowRightIcon.svg';
 import visibilityIcon from '../assets/svg/visibilityIcon.svg';
@@ -41,7 +42,7 @@ const SignUp = () => {
 
       await createUserDocument(user, { displayName });
 
-      navigate('/profile');
+      navigate('/');
     } catch (error) {
       switch (error.code) {
         case 'auth/email-already-in-use':

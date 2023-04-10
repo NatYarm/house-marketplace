@@ -1,5 +1,11 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
 import {
   getAuth,
   signInWithPopup,
@@ -8,7 +14,9 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   updateProfile,
+  onAuthStateChanged,
 } from 'firebase/auth';
+
 import { toast } from 'react-toastify';
 
 const firebaseConfig = {
@@ -77,3 +85,16 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
 };
 
 export const signOutUser = async () => await signOut(auth);
+
+export const onAuthStateChangedListener = (callback) => {
+  onAuthStateChanged(auth, callback);
+};
+
+export const updateUserProfile = async ({ displayName }) => {
+  return await updateProfile(auth.currentUser, { displayName });
+};
+
+export const updateUserDoc = async ({ displayName }) => {
+  const userDocRef = doc(db, 'users', auth.currentUser.uid);
+  return await updateDoc(userDocRef, { displayName });
+};

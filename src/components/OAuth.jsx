@@ -1,8 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  signInWithGooglePopup,
-  createUserDocument,
-} from '../utils/firebase.utils';
+import { signInWithGooglePopup } from '../utils/firebase.utils';
 import { toast } from 'react-toastify';
 import googleIcon from '../assets/svg/googleIcon.svg';
 
@@ -12,8 +9,7 @@ const OAuth = () => {
 
   const signInWithGoogle = async () => {
     try {
-      const { user } = await signInWithGooglePopup();
-      await createUserDocument(user);
+      await signInWithGooglePopup();
 
       navigate('/');
     } catch (error) {

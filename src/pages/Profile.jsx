@@ -1,15 +1,19 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth, db } from '../firebase.config';
-import { updateProfile } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore';
-import { signOutUser } from '../utils/firebase.utils';
+import { UserContext } from '../context/UserContext';
+import {
+  signOutUser,
+  updateUserProfile,
+  updateUserDoc,
+} from '../utils/firebase.utils';
 import { toast } from 'react-toastify';
 
 const Profile = () => {
+  const { currentUser } = useContext(UserContext);
+
   const [formData, setFormData] = useState({
-    displayName: auth.currentUser.displayName,
-    email: auth.currentUser.email,
+    displayName: currentUser.displayName,
+    email: currentUser.email,
   });
   const [changeDetails, setChangeDetails] = useState(false);
 
@@ -17,20 +21,20 @@ const Profile = () => {
 
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    signOutUser();
+  const handleLogout = async () => {
+    await signOutUser();
+
     navigate('/');
   };
 
   const handleSubmit = async () => {
     try {
-      if (auth.currentUser.displayName !== displayName) {
+      if (currentUser.displayName !== displayName) {
         //Update display name in firebase
-        await updateProfile(auth.currentUser, { displayName });
+        await updateUserProfile({ displayName });
 
         //Update in firestore
-        const userRef = doc(db, 'users', auth.currentUser.uid);
-        await updateDoc(userRef, { displayName });
+        await updateUserDoc({ displayName });
       }
     } catch (error) {
       toast.error('Could not update profile details.');
