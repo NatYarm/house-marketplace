@@ -21,9 +21,8 @@ const Profile = () => {
 
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    await signOutUser();
-
+  const handleLogout = () => {
+    signOutUser();
     navigate('/');
   };
 

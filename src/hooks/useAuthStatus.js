@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase.config';
+import { onAuthStateChangedListener } from '../utils/firebase.utils';
 
 export const useAuthStatus = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
 
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChangedListener((user) => {
     if (user) {
       setLoggedIn(true);
     }

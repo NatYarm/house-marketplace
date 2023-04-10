@@ -15,6 +15,7 @@ import {
   signOut,
   updateProfile,
   onAuthStateChanged,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 
 import { toast } from 'react-toastify';
@@ -97,4 +98,8 @@ export const updateUserProfile = async ({ displayName }) => {
 export const updateUserDoc = async ({ displayName }) => {
   const userDocRef = doc(db, 'users', auth.currentUser.uid);
   return await updateDoc(userDocRef, { displayName });
+};
+
+export const sendResetPasswordEmail = async (email) => {
+  return await sendPasswordResetEmail(auth, email);
 };

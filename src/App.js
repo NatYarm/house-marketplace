@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Explore from './pages/Explore';
@@ -13,7 +13,7 @@ import PrivateRoute from './components/PrivateRoute';
 function App() {
   return (
     <>
-      <Router>
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<Explore />} />
           <Route path="/offers" element={<Offers />} />
@@ -25,7 +25,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
         <Navbar />
-      </Router>
+      </BrowserRouter>
       <ToastContainer
         hideProgressBar={true}
         position="top-center"
