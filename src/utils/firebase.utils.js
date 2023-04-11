@@ -5,6 +5,13 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+  startAfter,
 } from 'firebase/firestore';
 import {
   getAuth,
@@ -40,6 +47,29 @@ const googleProvider = new GoogleAuthProvider();
 
 //Creating db
 export const db = getFirestore();
+
+export const getListings = async (categoryName) => {
+  // Get reference
+  const listingsRef = collection(db, 'listings');
+
+  // Create a query
+  const q = query(
+    listingsRef,
+    where('type', '==', categoryName),
+    orderBy('timestamp', 'desc'),
+    limit(10)
+  );
+
+  // Execute query
+  const querySnap = await getDocs(q);
+
+  const listings = [];
+
+  querySnap.forEach((doc) => {
+    return listings.push({ id: doc.id, data: doc.data() });
+  });
+  return listings;
+};
 
 export const createUserDocument = async (user, addititonalInfo = {}) => {
   if (!user) return;
