@@ -14,7 +14,7 @@ const Category = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const listings = await getListings(categoryName);
+        const listings = await getListings('type', categoryName);
 
         setListings(listings);
         setLoading(false);
