@@ -11,7 +11,6 @@ import {
   where,
   orderBy,
   limit,
-  startAfter,
 } from 'firebase/firestore';
 import {
   getAuth,
