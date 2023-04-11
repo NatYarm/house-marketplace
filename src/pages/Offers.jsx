@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { getListings } from '../utils/firebase.utils';
 import { toast } from 'react-toastify';
 import ListingItem from '../components/ListingItem';
@@ -8,8 +7,6 @@ import Spinner from '../components/Spinner';
 const Offers = () => {
   const [listings, setListings] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const { categoryName } = useParams();
 
   useEffect(() => {
     const fetchListings = async () => {

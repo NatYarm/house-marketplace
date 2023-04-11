@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 import {
   signOutUser,
@@ -7,18 +7,18 @@ import {
   updateUserDoc,
 } from '../utils/firebase.utils';
 import { toast } from 'react-toastify';
+import arrowRight from '../assets/svg/keyboardArrowRightIcon.svg';
+import homeIcon from '../assets/svg/homeIcon.svg';
 
 const Profile = () => {
   const { currentUser } = useContext(UserContext);
-
   const [formData, setFormData] = useState({
     displayName: currentUser.displayName,
     email: currentUser.email,
   });
-  const [changeDetails, setChangeDetails] = useState(false);
 
   const { displayName, email } = formData;
-
+  const [changeDetails, setChangeDetails] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -91,6 +91,11 @@ const Profile = () => {
             />
           </form>
         </div>
+        <Link to="/create-listing" className="createListing">
+          <img src={homeIcon} alt="home" />
+          <p>Sell or rent your home</p>
+          <img src={arrowRight} alt="arrow right" />
+        </Link>
       </main>
     </div>
   );
