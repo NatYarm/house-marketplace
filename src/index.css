@@ -609,6 +609,10 @@ button {
   margin-top: 0.5rem;
 }
 
+.textDanger {
+  color: red;
+}
+
 .messageDiv {
   margin-top: 2rem;
   display: flex;
@@ -723,7 +727,7 @@ button {
 
 .formLabel {
   font-weight: 600;
-  margin-top: 1rem;
+  margin-top: 1.2rem;
   display: block;
 }
 
@@ -736,6 +740,7 @@ button {
 .formInputAddress,
 .formInputName,
 .formInputSmall,
+.formInputNumber,
 .formInputFile,
 .formButtonActive {
   padding: 0.9rem 3rem;
@@ -753,6 +758,39 @@ button {
   color: #ffffff;
 }
 
+/* ////////////// */
+
+.radioButtons {
+  border-radius: 3px;
+  position: relative;
+  width: fit-content;
+  display: flex;
+}
+
+.radioButtons input {
+  appearance: none;
+  cursor: pointer;
+  border-radius: 1rem;
+  margin: 0.5rem 0.5rem 0 0;
+  padding: 0.9rem 3rem;
+  background-color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.1s;
+}
+
+.radioButtons input:checked {
+  background-color: #00cc66;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+}
+
+.radioButtons input::before {
+  content: attr(label);
+  text-align: center;
+}
+
+/* /////////////// */
 .flex {
   display: flex;
 }
@@ -761,16 +799,22 @@ button {
 .formInputAddress,
 .formInputName,
 .formInputSmall,
+.formInputNumber,
 .formInputFile {
   border: none;
   outline: none;
   font-family: 'Montserrat', sans-serif;
 }
 .formInputSmall,
+.formInputNumber,
 .formInputFile {
   margin-right: 3rem;
   padding: 0.9rem 0.7rem;
   text-align: center;
+}
+
+.formInputNumber {
+  max-width: 5rem;
 }
 
 .formInputName {
