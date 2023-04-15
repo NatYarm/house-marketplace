@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import UserContext from '../context/UserContext';
 import Spinner from '../components/Spinner';
 import RadioGroup from '../components/RadioGroup';
+import { toast } from 'react-toastify';
 
 const defaultValues = {
   type: 'rent',
@@ -49,16 +50,50 @@ const CreateListing = () => {
       unregister('discountedPrice');
     }
     if (!geolocationEnabled) {
-      register('longitude');
       register('latitude');
+      register('longitude');
     } else {
-      unregister('longitude');
       unregister('latitude');
+      unregister('longitude');
     }
   }, [register, unregister, watchOffer, geolocationEnabled]);
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
+    setLoading(true);
     console.log(data);
+    if (data.discountedPrice >= data.regularPrice) {
+      setLoading(false);
+      toast.error('Discounted price needs to be less than regular price');
+      return;
+    }
+
+    let geolocation = {};
+    let location;
+    try {
+      if (geolocationEnabled) {
+        const resp = await fetch(
+          `https://api.geoapify.com/v1/geocode/search?text=${data.address}&apiKey=${process.env.REACT_APP_GEOCODE_API_KEY}`
+        );
+
+        const coords = await resp.json();
+        geolocation.lat = coords.features[0]?.properties.lat ?? 0;
+        geolocation.lng = coords.features[0]?.properties.lon ?? 0;
+        location = coords.features[0]?.properties.formatted;
+
+        if (location === undefined || location.includes('undefined')) {
+          setLoading(false);
+          toast.error('Please enter a valid address.');
+        }
+
+        console.log(geolocation, location);
+      } else {
+        geolocation.lat = data.latitude;
+        geolocation.lng = data.longitude;
+        location = data.address;
+      }
+    } catch (error) {}
+
+    setLoading(false);
     //setFormData({ ...data, userRef: currentUser.uid });
   };
 
@@ -112,7 +147,6 @@ const CreateListing = () => {
       min: { value: 50, message: 'Min price is 50' },
       max: { value: 750000000, message: 'Max price is 750000000' },
     },
-
     images: {
       required: 'Images are required',
       max: 6,
@@ -208,7 +242,7 @@ const CreateListing = () => {
                 <label className="formLabel">Latitude</label>
                 <input
                   className="formInputSmall"
-                  type="number"
+                  type="text"
                   placeholder="e.g. 41.20559"
                   {...register('latitude', formInputs.latitude)}
                   required={!geolocationEnabled}
@@ -218,7 +252,7 @@ const CreateListing = () => {
                 <label className="formLabel">Longitude</label>
                 <input
                   className="formInputSmall"
-                  type="number"
+                  type="text"
                   placeholder="e.g. -73.15053"
                   {...register('longitude', formInputs.longitude)}
                   required={!geolocationEnabled}
