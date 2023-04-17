@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import UserContext from '../context/UserContext';
+import { storeImage } from '../utils/firebase.utils';
 import Spinner from '../components/Spinner';
 import RadioGroup from '../components/RadioGroup';
 import { toast } from 'react-toastify';
@@ -25,7 +26,7 @@ const defaultValues = {
 const CreateListing = () => {
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
   //const [formData, setFormData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   //const { currentUser } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -67,6 +68,12 @@ const CreateListing = () => {
       return;
     }
 
+    if (data.images.length > 6) {
+      setLoading(false);
+      toast.error('Max 6 images');
+      return;
+    }
+
     let geolocation = {};
     let location;
     try {
@@ -91,8 +98,21 @@ const CreateListing = () => {
         geolocation.lng = data.longitude;
         location = data.address;
       }
-    } catch (error) {}
+    } catch (error) {
+      toast.error('Location not found');
+    }
 
+    //Store images in firebase
+    const imgUrls = await Promise.all(
+      [...data.images].map((image) =>
+        storeImage(image).catch(() => {
+          setLoading(false);
+          toast.error('Images not uploaded');
+          return;
+        })
+      )
+    );
+    console.log(imgUrls);
     setLoading(false);
     //setFormData({ ...data, userRef: currentUser.uid });
   };
@@ -136,6 +156,7 @@ const CreateListing = () => {
     },
     longitude: { valueAsNumber: true },
     latitude: { valueAsNumber: true },
+
     regularPrice: {
       valueAsNumber: true,
       required: 'Please enter price',
@@ -148,12 +169,13 @@ const CreateListing = () => {
       max: { value: 750000000, message: 'Max price is 750000000' },
     },
     images: {
-      required: 'Images are required',
-      max: 6,
-      multiple: true,
-      accept: '.jpg,.png,.jpeg',
+      required: 'Please select an image',
     },
   };
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="profile">
@@ -179,7 +201,6 @@ const CreateListing = () => {
               {...register('type')}
             />
           </div>
-
           <label className="formLabel">Name</label>
           <input
             className="formInputName"
@@ -189,7 +210,6 @@ const CreateListing = () => {
           <small className="textDanger">
             {errors?.name && errors.name.message}
           </small>
-
           <div className="formRooms flex">
             <div>
               <label className="formLabel">Bedrooms</label>
@@ -214,18 +234,14 @@ const CreateListing = () => {
               </small>
             </div>
           </div>
-
           <label className="formLabel">Parking spot</label>
-
           <div className="radioButtons">
             <RadioGroup control={control} name="parking" />
           </div>
-
           <label className="formLabel">Furnished</label>
           <div className="radioButtons">
             <RadioGroup control={control} name="furnished" />
           </div>
-
           <label className="formLabel">Address</label>
           <textarea
             className="formInputAddress"
@@ -235,7 +251,6 @@ const CreateListing = () => {
           <small className="textDanger">
             {errors?.address && errors.address.message}
           </small>
-
           {!geolocationEnabled && (
             <div className="formLatLng flex">
               <div>
@@ -260,12 +275,10 @@ const CreateListing = () => {
               </div>
             </div>
           )}
-
           <label className="formLabel">Offer</label>
           <div className="radioButtons">
             <RadioGroup control={control} name="offer" />
           </div>
-
           <label className="formLabel">Regular Price</label>
           <div className="formPriceDiv">
             <input
@@ -278,7 +291,6 @@ const CreateListing = () => {
           <small className="textDanger">
             {errors?.regularPrice && errors.regularPrice.message}
           </small>
-
           {watchOffer && (
             <>
               <label className="formLabel">Discounted Price</label>
@@ -293,7 +305,6 @@ const CreateListing = () => {
               </small>
             </>
           )}
-
           <label className="formLabel">Images</label>
           <p className="imagesInfo">
             The first image will be the cover (max 6).
@@ -301,6 +312,9 @@ const CreateListing = () => {
           <input
             className="formInputFile"
             type="file"
+            multiple
+            max={6}
+            accept=".jpg,.png,.jpeg"
             {...register('images', formInputs.images)}
           />
           <small className="textDanger">
