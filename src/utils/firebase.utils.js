@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import {
   getFirestore,
   doc,
+  addDoc,
   getDoc,
   setDoc,
   updateDoc,
@@ -105,6 +106,10 @@ export const createUserDocument = async (user, addititonalInfo = {}) => {
   return userDocRef;
 };
 
+export const addDocsToCollection = async (collectionName, objectToAdd) => {
+  return await addDoc(collection(db, collectionName), objectToAdd);
+};
+
 export const signInWithGooglePopup = () =>
   signInWithPopup(auth, googleProvider);
 
@@ -149,28 +154,15 @@ export const storeImage = async (image) => {
     uploadTask.on(
       'state_changed',
       (snapshot) => {
-        // Observe state change events such as progress, pause, and resume
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         console.log('Upload is ' + progress + '% done');
-        // switch (snapshot.state) {
-        //   case 'paused':
-        //     console.log('Upload is paused');
-        //     break;
-        //   case 'running':
-        //     console.log('Upload is running');
-        //     break;
-        //   default:
-        //     console.log('Done');
-        // }
       },
       (error) => {
         reject(error);
       },
       () => {
         // Handle successful uploads on complete
-        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           resolve(downloadURL);
         });

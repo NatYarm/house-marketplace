@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import UserContext from '../context/UserContext';
-import { storeImage } from '../utils/firebase.utils';
+import { storeImage, addDocsToCollection } from '../utils/firebase.utils';
 import Spinner from '../components/Spinner';
 import RadioGroup from '../components/RadioGroup';
 import { toast } from 'react-toastify';
@@ -24,10 +24,9 @@ const defaultValues = {
 };
 
 const CreateListing = () => {
-  const [geolocationEnabled, setGeolocationEnabled] = useState(true);
-  //const [formData, setFormData] = useState(null);
+  const [geolocationEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
-  //const { currentUser } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const navigate = useNavigate();
 
   const {
@@ -91,8 +90,6 @@ const CreateListing = () => {
           setLoading(false);
           toast.error('Please enter a valid address.');
         }
-
-        console.log(geolocation, location);
       } else {
         geolocation.lat = data.latitude;
         geolocation.lng = data.longitude;
@@ -112,12 +109,25 @@ const CreateListing = () => {
         })
       )
     );
-    console.log(imgUrls);
+
+    const newListing = {
+      ...data,
+      imgUrls,
+      geolocation,
+      userRef: currentUser.uid,
+      timestamp: new Date(),
+    };
+
+    delete newListing.images;
+    delete newListing.address;
+    location && (newListing.location = location);
+
+    const docRef = await addDocsToCollection('listings', newListing);
     setLoading(false);
-    //setFormData({ ...data, userRef: currentUser.uid });
+    toast.success('Listing added');
+    navigate(`/category/${newListing.type}/${docRef.id}`);
   };
 
-  //console.log(formData);
   const formInputs = {
     name: {
       required: 'The name field is required',
