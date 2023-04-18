@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getListing } from '../utils/firebase.utils';
 import Spinner from '../components/Spinner';
 import shareIcon from '../assets/svg/shareIcon.svg';
+import UserContext from '../context/UserContext';
 
 const Listing = () => {
   const [listing, setListing] = useState(null);
@@ -11,20 +12,86 @@ const Listing = () => {
 
   const navigate = useNavigate();
   const { listingId } = useParams();
+  const { currentUser } = useContext(UserContext);
 
   useEffect(() => {
     const fetchListing = async () => {
-      const listing = await getListing(listingId);
-      setListing(listing);
+      const selectedListing = await getListing(listingId);
+      setListing(selectedListing);
       setLoading(false);
     };
 
     fetchListing();
   }, [listingId, navigate]);
 
-  console.log(listing);
+  const handleClick = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setShareLinkCopied(true);
+    setTimeout(() => {
+      setShareLinkCopied(false);
+    }, 2000);
+  };
 
-  return <div>Listing</div>;
+  if (loading) {
+    return <Spinner />;
+  }
+
+  const {
+    name,
+    offer,
+    discountedPrice,
+    regularPrice,
+    location,
+    type,
+    bedrooms,
+    bathrooms,
+    parking,
+    furnished,
+    userRef,
+  } = listing;
+
+  return (
+    <main>
+      {/* Slider */}
+      <div className="shareIconDiv" onClick={handleClick}>
+        <img src={shareIcon} alt="share icon" />
+      </div>
+      {shareLinkCopied && <p className="linkCopied">Link copied</p>}
+      <div className="listingDetails">
+        <p className="listingName">
+          {name} - $
+          {offer
+            ? discountedPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+            : regularPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+        </p>
+        <p className="listingLocation">{location}</p>
+        <p className="listingType">For {type === 'rent' ? 'Rent' : 'Sale'}</p>
+        {offer && (
+          <p className="discountPrice">
+            ${regularPrice - discountedPrice} discount
+          </p>
+        )}
+
+        <ul className="listingDetailsList">
+          <li>{bedrooms > 1 ? `${bedrooms} Bedrooms` : '1 Bedroom'}</li>
+          <li>{bathrooms > 1 ? `${bathrooms} Bathrooms` : '1 Bathroom'}</li>
+          <li>{parking && 'Parking Spot'}</li>
+          <li>{furnished && 'Furnished'}</li>
+        </ul>
+        <p className="listingLocationTitle">Location</p>
+        {/* Map */}
+
+        {currentUser?.uid !== userRef && (
+          <Link
+            to={`/contact/${userRef}?listingName=${name}&listingLocation=${location}`}
+            className="primaryButton"
+          >
+            Contact Landlord
+          </Link>
+        )}
+      </div>
+    </main>
+  );
 };
 
 export default Listing;
