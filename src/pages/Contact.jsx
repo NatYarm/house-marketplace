@@ -44,18 +44,25 @@ const Contact = () => {
                 className="textarea"
                 value={message}
                 onChange={handleChange}
-              ></textarea>
+              />
             </div>
+
+            <div className="clearBtnDiv">
+              <button className="clearButton" onClick={() => setMessage('')}>
+                Clear Message
+              </button>
+            </div>
+
+            <a
+              href={`mailto:${landlord.email}?Subject=${searchParams.get(
+                'listingName'
+              )}&body=${message}`}
+            >
+              <button type="button" className="primaryButton">
+                Send Message
+              </button>
+            </a>
           </form>
-          <a
-            href={`mailto:${landlord.email}?Subject=${searchParams.get(
-              'listingName'
-            )}&body=${message}`}
-          >
-            <button type="button" className="primaryButton">
-              Send Message
-            </button>
-          </a>
         </main>
       )}
     </div>

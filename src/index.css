@@ -605,6 +605,20 @@ button {
   font-size: 1.2rem;
 }
 
+.clearBtnDiv {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 4rem;
+}
+
+.clearButton {
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 0.5rem;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #ececf0;
+}
+
 .messageForm {
   margin-top: 0.5rem;
 }
@@ -617,7 +631,7 @@ button {
   margin-top: 2rem;
   display: flex;
   flex-direction: column;
-  margin-bottom: 4rem;
+  margin-bottom: 0.5rem;
 }
 
 .messageLabel {
