@@ -93,7 +93,6 @@ const CreateListing = () => {
       } else {
         geolocation.lat = data.latitude;
         geolocation.lng = data.longitude;
-        location = data.address;
       }
     } catch (error) {
       toast.error('Location not found');
@@ -118,9 +117,9 @@ const CreateListing = () => {
       timestamp: new Date(),
     };
 
+    newListing.location = data.address;
     delete newListing.images;
     delete newListing.address;
-    location && (newListing.location = location);
 
     const docRef = await addDocsToCollection('listings', newListing);
     setLoading(false);

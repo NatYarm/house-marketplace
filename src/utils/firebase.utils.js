@@ -77,6 +77,13 @@ export const getListings = async (type, param) => {
   return listings;
 };
 
+export const getListing = async (listingId) => {
+  const docRef = doc(db, 'listings', listingId);
+  const docSnap = await getDoc(docRef);
+  const listing = docSnap.data();
+  return listing;
+};
+
 export const createUserDocument = async (user, addititonalInfo = {}) => {
   if (!user) return;
 
