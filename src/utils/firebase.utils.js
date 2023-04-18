@@ -80,8 +80,25 @@ export const getListings = async (type, param) => {
 export const getListing = async (listingId) => {
   const docRef = doc(db, 'listings', listingId);
   const docSnap = await getDoc(docRef);
-  const listing = docSnap.data();
-  return listing;
+
+  if (docSnap.exists()) {
+    const listing = docSnap.data();
+    return listing;
+  } else {
+    toast.error('Could not get the listing');
+  }
+};
+
+export const getUser = async (userId) => {
+  const docRef = doc(db, 'users', userId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const user = docSnap.data();
+    return user;
+  } else {
+    toast.error('Could not get landlord data');
+  }
 };
 
 export const createUserDocument = async (user, addititonalInfo = {}) => {
@@ -93,13 +110,13 @@ export const createUserDocument = async (user, addititonalInfo = {}) => {
 
   if (!userSnapshot.exists()) {
     const { displayName, email } = user;
-    const created = new Date();
+    const timestamp = new Date();
 
     try {
       await setDoc(userDocRef, {
         displayName,
         email,
-        created,
+        timestamp,
         ...addititonalInfo,
       });
 

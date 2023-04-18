@@ -83,7 +83,7 @@ const Listing = () => {
 
         {currentUser?.uid !== userRef && (
           <Link
-            to={`/contact/${userRef}?listingName=${name}&listingLocation=${location}`}
+            to={`/contact/${userRef}?listingName=${name}`}
             className="primaryButton"
           >
             Contact Landlord
