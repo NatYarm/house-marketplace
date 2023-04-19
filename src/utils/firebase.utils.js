@@ -12,6 +12,7 @@ import {
   where,
   orderBy,
   limit,
+  deleteDoc,
 } from 'firebase/firestore';
 import {
   getAuth,
@@ -65,7 +66,6 @@ export const getListings = async (field, param) => {
   }
   const q = query(
     listingsRef,
-    // where(field, '==', param),
     orderBy('timestamp', 'desc'),
     limit(10),
     ...queryConstraints
@@ -198,4 +198,9 @@ export const storeImage = async (image) => {
       }
     );
   });
+};
+
+export const deleteListing = async (listingId) => {
+  const docRef = doc(db, 'listings', listingId);
+  return await deleteDoc(docRef, listingId);
 };
