@@ -1,10 +1,14 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import SwiperCore, { Navigation, Pagination, Scrollbar, A11y } from 'swiper';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/swiper-bundle.css';
 import { getListing } from '../utils/firebase.utils';
 import Spinner from '../components/Spinner';
 import shareIcon from '../assets/svg/shareIcon.svg';
 import UserContext from '../context/UserContext';
+SwiperCore.use([Navigation, Pagination, Scrollbar, A11y]);
 
 const Listing = () => {
   const [listing, setListing] = useState(null);
@@ -50,11 +54,21 @@ const Listing = () => {
     furnished,
     userRef,
     geolocation,
+    imgUrls,
   } = listing;
 
   return (
     <main>
-      {/* Slider */}
+      <Swiper slidesPerView={1} pagination={{ clickable: true }}>
+        {imgUrls.map((url, index) => (
+          <SwiperSlide key={index}>
+            <div className="swiperSlideDiv">
+              <img src={url} alt="" className="swiperSlideImg" />
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
       <div className="shareIconDiv" onClick={handleClick}>
         <img src={shareIcon} alt="share icon" />
       </div>
