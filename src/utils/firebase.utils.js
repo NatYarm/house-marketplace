@@ -54,16 +54,21 @@ const googleProvider = new GoogleAuthProvider();
 //Creating db
 export const db = getFirestore();
 
-export const getListings = async (type, param) => {
+export const getListings = async (field, param) => {
   // Get reference
   const listingsRef = collection(db, 'listings');
 
   // Create a query
+  const queryConstraints = [];
+  if (field !== null) {
+    queryConstraints.push(where(field, '==', param));
+  }
   const q = query(
     listingsRef,
-    where(type, '==', param),
+    // where(field, '==', param),
     orderBy('timestamp', 'desc'),
-    limit(10)
+    limit(10),
+    ...queryConstraints
   );
 
   // Execute query

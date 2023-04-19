@@ -84,7 +84,11 @@ const Listing = () => {
         <p className="listingType">For {type === 'rent' ? 'Rent' : 'Sale'}</p>
         {offer && (
           <p className="discountPrice">
-            ${regularPrice - discountedPrice} discount
+            $
+            {(regularPrice - discountedPrice)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}{' '}
+            discount
           </p>
         )}
 
