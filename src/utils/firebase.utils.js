@@ -73,7 +73,7 @@ const updateListings = (querySnap) => {
 
 export let lastVisible = null;
 
-export const getListings = async (fieldName, fieldValue, pageSize = 10) => {
+export const getListings = async (fieldName, fieldValue, pageSize = 2) => {
   // Create a query
   const queryConstraints = [];
   if (fieldName !== null) {
@@ -98,7 +98,7 @@ export const getListings = async (fieldName, fieldValue, pageSize = 10) => {
   return listings;
 };
 
-export const getMoreListings = async (fieldName, fieldValue, pageSize = 10) => {
+export const getMoreListings = async (fieldName, fieldValue, pageSize = 2) => {
   const queryConstraints = [];
   if (fieldName !== null) {
     queryConstraints.push(where(fieldName, '==', fieldValue));

@@ -75,14 +75,14 @@ button {
 .removeIcon {
   cursor: pointer;
   position: absolute;
-  top: -3%;
-  right: -2%;
+  top: 18%;
+  right: -0.2%;
 }
 .editIcon {
   cursor: pointer;
   position: absolute;
-  top: -3.4%;
-  right: 20px;
+  top: 68%;
+  right: -0.2%;
 }
 
 .pageContainer,
@@ -430,6 +430,7 @@ button {
   height: 100px;
   border-radius: 1.5rem;
   object-fit: cover;
+  margin-right: 20px;
 }
 @media (min-width: 1024px) {
   .categoryListingImg {
@@ -646,7 +647,8 @@ button {
 }
 
 .profile {
-  margin-bottom: 10rem;
+  margin: 0 auto 10rem;
+  width: 90%;
 }
 
 .profileHeader {
@@ -742,7 +744,7 @@ button {
   font-weight: 600;
 }
 
-.lisitingsList {
+.listingsList {
   padding: 0;
 }
 
