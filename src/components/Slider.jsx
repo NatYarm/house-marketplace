@@ -17,7 +17,7 @@ const Slider = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const listings = await getListings(null);
+        const listings = await getListings(null, null, 5);
 
         setListings(listings);
         setLoading(false);
@@ -27,8 +27,6 @@ const Slider = () => {
     };
     fetchListings();
   }, []);
-
-  //console.log(listings);
 
   if (loading) {
     return <Spinner />;

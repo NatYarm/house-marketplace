@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { getListings } from '../utils/firebase.utils';
+import {
+  getListings,
+  getMoreListings,
+  lastVisible,
+} from '../utils/firebase.utils';
 import { toast } from 'react-toastify';
 import ListingItem from '../components/ListingItem';
 import Spinner from '../components/Spinner';
@@ -22,6 +26,16 @@ const Offers = () => {
     fetchListings();
   }, []);
 
+  const onFetchMoreListings = async () => {
+    try {
+      const listings = await getMoreListings('offer', true);
+      setListings((prevState) => [...prevState, ...listings]);
+      setLoading(false);
+    } catch (error) {
+      toast.error('Could not fetch listings');
+    }
+  };
+
   return (
     <div className="category">
       <header>
@@ -42,6 +56,15 @@ const Offers = () => {
               ))}
             </ul>
           </main>
+          <br />
+          <br />
+          {lastVisible ? (
+            <p className="loadMore" onClick={onFetchMoreListings}>
+              Load More
+            </p>
+          ) : (
+            <p className="noListings">No more current offers</p>
+          )}
         </>
       ) : (
         <p>There are no current offers</p>

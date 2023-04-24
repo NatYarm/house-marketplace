@@ -12,6 +12,7 @@ import {
   where,
   orderBy,
   limit,
+  startAfter,
   deleteDoc,
 } from 'firebase/firestore';
 import {
@@ -55,30 +56,68 @@ const googleProvider = new GoogleAuthProvider();
 //Creating db
 export const db = getFirestore();
 
-export const getListings = async (field, param) => {
-  // Get reference
-  const listingsRef = collection(db, 'listings');
+// Get collection reference
+const listingsRef = collection(db, 'listings');
 
-  // Create a query
-  const queryConstraints = [];
-  if (field !== null) {
-    queryConstraints.push(where(field, '==', param));
-  }
-  const q = query(
-    listingsRef,
-    orderBy('timestamp', 'desc'),
-    limit(10),
-    ...queryConstraints
-  );
-
-  // Execute query
-  const querySnap = await getDocs(q);
+const updateListings = (querySnap) => {
+  //Get last visible doc
+  lastVisible = querySnap.docs[querySnap.docs.length - 1];
 
   const listings = [];
 
   querySnap.forEach((doc) => {
     return listings.push({ id: doc.id, data: doc.data() });
   });
+  return listings;
+};
+
+export let lastVisible = null;
+
+export const getListings = async (fieldName, fieldValue, pageSize = 10) => {
+  // Create a query
+  const queryConstraints = [];
+  if (fieldName !== null) {
+    queryConstraints.push(where(fieldName, '==', fieldValue));
+  }
+  if (fieldValue !== null) {
+    queryConstraints.push(where(fieldName, '==', fieldValue));
+  }
+
+  const q = query(
+    listingsRef,
+    orderBy('timestamp', 'desc'),
+    limit(pageSize),
+    ...queryConstraints
+  );
+
+  // Execute query
+  const querySnap = await getDocs(q);
+
+  const listings = updateListings(querySnap);
+
+  return listings;
+};
+
+export const getMoreListings = async (fieldName, fieldValue, pageSize = 10) => {
+  const queryConstraints = [];
+  if (fieldName !== null) {
+    queryConstraints.push(where(fieldName, '==', fieldValue));
+  }
+  if (fieldValue !== null) {
+    queryConstraints.push(where(fieldName, '==', fieldValue));
+  }
+
+  const q = query(
+    listingsRef,
+    orderBy('timestamp', 'desc'),
+    startAfter(lastVisible),
+    limit(pageSize),
+    ...queryConstraints
+  );
+
+  const querySnap = await getDocs(q);
+  const listings = updateListings(querySnap);
+
   return listings;
 };
 
