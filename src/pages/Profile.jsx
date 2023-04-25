@@ -28,7 +28,7 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchUserListings = async () => {
-      const userListings = await getListings('userRef', currentUser.uid);
+      const userListings = await getListings('userRef', currentUser.uid, 10);
       setListings(userListings);
       setLoading(false);
     };

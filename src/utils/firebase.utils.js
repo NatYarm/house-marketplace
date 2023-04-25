@@ -129,7 +129,7 @@ export const getListing = async (listingId) => {
     const listing = docSnap.data();
     return listing;
   } else {
-    toast.error('Could not get the listing');
+    toast.error('Listing does not exitst');
   }
 };
 
@@ -174,10 +174,6 @@ export const createUserDocument = async (user, addititonalInfo = {}) => {
   return userDocRef;
 };
 
-export const addDocsToCollection = async (collectionName, objectToAdd) => {
-  return await addDoc(collection(db, collectionName), objectToAdd);
-};
-
 export const signInWithGooglePopup = () =>
   signInWithPopup(auth, googleProvider);
 
@@ -199,6 +195,10 @@ export const onAuthStateChangedListener = (callback) => {
   onAuthStateChanged(auth, callback);
 };
 
+export const addDocsToCollection = async (collectionName, objectToAdd) => {
+  return await addDoc(collection(db, collectionName), objectToAdd);
+};
+
 export const updateUserProfile = async ({ displayName }) => {
   return await updateProfile(auth.currentUser, { displayName });
 };
@@ -206,6 +206,15 @@ export const updateUserProfile = async ({ displayName }) => {
 export const updateUserDoc = async ({ displayName }) => {
   const userDocRef = doc(db, 'users', auth.currentUser.uid);
   return await updateDoc(userDocRef, { displayName });
+};
+
+export const updateListing = async (listingId, updatedListing) => {
+  return await updateDoc(doc(db, 'listings', listingId), updatedListing);
+};
+
+export const deleteListing = async (listingId) => {
+  const docRef = doc(db, 'listings', listingId);
+  return await deleteDoc(docRef, listingId);
 };
 
 export const sendResetPasswordEmail = async (email) => {
@@ -237,9 +246,4 @@ export const storeImage = async (image) => {
       }
     );
   });
-};
-
-export const deleteListing = async (listingId) => {
-  const docRef = doc(db, 'listings', listingId);
-  return await deleteDoc(docRef, listingId);
 };
