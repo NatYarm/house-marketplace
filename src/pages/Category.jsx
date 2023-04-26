@@ -19,7 +19,6 @@ const Category = () => {
     const fetchListings = async () => {
       try {
         const listings = await getListings('type', categoryName);
-
         setListings(listings);
         setLoading(false);
       } catch (error) {

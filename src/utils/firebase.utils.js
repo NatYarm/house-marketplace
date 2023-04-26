@@ -59,6 +59,8 @@ export const db = getFirestore();
 // Get collection reference
 const listingsRef = collection(db, 'listings');
 
+export let lastVisible;
+
 const updateListings = (querySnap) => {
   //Get last visible doc
   lastVisible = querySnap.docs[querySnap.docs.length - 1];
@@ -71,11 +73,10 @@ const updateListings = (querySnap) => {
   return listings;
 };
 
-export let lastVisible = null;
-
 export const getListings = async (fieldName, fieldValue, pageSize = 2) => {
   // Create a query
   const queryConstraints = [];
+
   if (fieldName !== null) {
     queryConstraints.push(where(fieldName, '==', fieldValue));
   }
@@ -92,27 +93,18 @@ export const getListings = async (fieldName, fieldValue, pageSize = 2) => {
 
   // Execute query
   const querySnap = await getDocs(q);
-
   const listings = updateListings(querySnap);
 
   return listings;
 };
 
 export const getMoreListings = async (fieldName, fieldValue, pageSize = 2) => {
-  const queryConstraints = [];
-  if (fieldName !== null) {
-    queryConstraints.push(where(fieldName, '==', fieldValue));
-  }
-  if (fieldValue !== null) {
-    queryConstraints.push(where(fieldName, '==', fieldValue));
-  }
-
   const q = query(
     listingsRef,
     orderBy('timestamp', 'desc'),
+    where(fieldName, '==', fieldValue),
     startAfter(lastVisible),
-    limit(pageSize),
-    ...queryConstraints
+    limit(pageSize)
   );
 
   const querySnap = await getDocs(q);
@@ -129,7 +121,7 @@ export const getListing = async (listingId) => {
     const listing = docSnap.data();
     return listing;
   } else {
-    toast.error('Listing does not exitst');
+    toast.error('Listing does not exist');
   }
 };
 
@@ -213,8 +205,7 @@ export const updateListing = async (listingId, updatedListing) => {
 };
 
 export const deleteListing = async (listingId) => {
-  const docRef = doc(db, 'listings', listingId);
-  return await deleteDoc(docRef, listingId);
+  return await deleteDoc(doc(db, 'listings', listingId));
 };
 
 export const sendResetPasswordEmail = async (email) => {
